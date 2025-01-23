@@ -40,27 +40,28 @@ def create_tts_request(text, reference_id=None, reference_audio=None, reference_
     return ServeTTSRequest(**data)
 
 def handle_streaming_response(response, output_file, channels=1, rate=44100):
-    p = pyaudio.PyAudio()
-    audio_format = pyaudio.paInt16
+    # p = pyaudio.PyAudio()
+    # audio_format = pyaudio.paInt16
     # stream = p.open(
     #     format=audio_format, channels=channels, rate=rate, output=True
     # )
 
-    wf = wave.open(f"{output_file}.wav", "wb")
-    wf.setnchannels(channels)
-    wf.setsampwidth(p.get_sample_size(audio_format))
-    wf.setframerate(rate)
+    # wf = wave.open(f"{output_file}.wav", "wb")
+    # wf.setnchannels(channels)
+    # wf.setsampwidth(p.get_sample_size(audio_format))
+    # wf.setframerate(rate)
 
-    try:
-        for chunk in response.iter_content(chunk_size=1024):
-            if chunk:
-                # stream.write(chunk)
-                wf.writeframesraw(chunk)
-    finally:
+    # try:
+    for chunk in response.iter_content(chunk_size=1024):
+        if chunk:
+            # stream.write(chunk)
+            # wf.writeframesraw(chunk)
+            print("get chunk")
+    # finally:
         # stream.stop_stream()
         # stream.close()
-        p.terminate()
-        wf.close()
+        # p.terminate()
+        # wf.close()
 
 def synthesize_speech(
     text,
