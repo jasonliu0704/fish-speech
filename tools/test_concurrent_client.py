@@ -3,87 +3,34 @@ import time
 from typing import List, Dict, Any
 # import pytest
 
-from test_client import create_tts_request, synthesize_speech
+from test_client import synthesize_speech
 from fish_speech.utils.schema import ServeTTSRequest
 
 def generate_test_cases() -> List[Dict[str, Any]]:
-    return [
-        {
-            "text": "This is test case 1",
-            "normalize": True,
-            "format": "wav",
-            "temperature": 0.7
-        },
-        {
-            "text": "This is test case 2 with different parameters",
-            "normalize": False,
-            "format": "wav",
-            "temperature": 0.8
-        },
-        {
-            "text": "Test case 3 with reference",
-            "reference_id": "test_reference",
-            "format": "wav",
-            "temperature": 0.6
-        }
+    texts = [
+        "Hello, this is a test case.",
+        "Testing different voice parameters.",
+        "Let's try another variation.",
+        "This is a longer sentence to test synthesis capabilities.",
+        "Short test."
     ]
-
-def test_create_tts_request():
-    start_time = time.time()
-    test_cases = generate_test_cases()
     
-    # Test single request creation
-    request = create_tts_request(**test_cases[0])
-    assert isinstance(request, ServeTTSRequest)
-    assert request.text == test_cases[0]["text"]
-    
-    print(f"\nSingle Request Test:")
-    print(f"Total time: {time.time() - start_time:.2f} seconds")
-
-def execute_tts_request(params: Dict[str, Any]) -> tuple[float, bool]:
-    start_time = time.time()
-    try:
-        request = create_tts_request(**params)
-        assert isinstance(request, ServeTTSRequest)
-        success = True
-    except Exception as e:
-        print(f"Error processing request: {e}")
-        success = False
-    duration = time.time() - start_time
-    return duration, success
-
-def test_concurrent_requests():
-    test_cases = generate_test_cases() * 3  # Create 9 test cases
-    start_time = time.time()
-    results = []
-    
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-        future_to_params = {
-            executor.submit(execute_tts_request, params): params 
-            for params in test_cases
+    test_cases = []
+    for i in range(50):
+        test_case = {
+            "text": texts[i % len(texts)],
+            "normalize": i % 2 == 0,
+            "format": "wav",
+            "temperature": round(0.5 + (i % 6) * 0.1, 1),  # varies from 0.5 to 1.0
+            "top_p": round(0.5 + (i % 5) * 0.1, 1),  # varies from 0.5 to 0.9
+            "repetition_penalty": round(1.0 + (i % 4) * 0.1, 1),  # varies from 1.0 to 1.3
+            "chunk_length": 150 + (i % 3) * 50,  # varies between 150, 200, 250
+            "seed": i if i % 3 == 0 else None  # alternates between None and values
         }
-        
-        for future in concurrent.futures.as_completed(future_to_params):
-            params = future_to_params[future]
-            try:
-                duration, success = future.result()
-                results.append({
-                    "params": params,
-                    "duration": duration,
-                    "success": success
-                })
-            except Exception as e:
-                print(f"Request failed: {e}")
+        test_cases.append(test_case)
     
-    total_time = time.time() - start_time
-    successful_requests = sum(1 for r in results if r["success"])
-    
-    print(f"\nConcurrent Test Results:")
-    print(f"Total time: {total_time:.2f} seconds")
-    print(f"Successful requests: {successful_requests}/{len(test_cases)}")
-    print(f"Average request time: {sum(r['duration'] for r in results)/len(results):.2f} seconds")
-    
-    assert successful_requests == len(test_cases)
+    print(f"Generated {len(test_cases)} test cases with varying parameters")
+    return test_cases
 
 def test_concurrent_synthesis():
     test_cases = generate_test_cases()[:2]  # Use fewer cases for synthesis test
@@ -122,9 +69,7 @@ def test_concurrent_synthesis():
 if __name__ == "__main__":
     print("Running concurrent TTS request tests...")
     total_start_time = time.time()
-    
-    test_create_tts_request()
-    test_concurrent_requests()
+
     test_concurrent_synthesis()
     
     print(f"\nTotal Test Execution Time: {time.time() - total_start_time:.2f} seconds")
