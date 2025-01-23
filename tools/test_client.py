@@ -42,9 +42,9 @@ def create_tts_request(text, reference_id=None, reference_audio=None, reference_
 def handle_streaming_response(response, output_file, channels=1, rate=44100):
     p = pyaudio.PyAudio()
     audio_format = pyaudio.paInt16
-    stream = p.open(
-        format=audio_format, channels=channels, rate=rate, output=True
-    )
+    # stream = p.open(
+    #     format=audio_format, channels=channels, rate=rate, output=True
+    # )
 
     wf = wave.open(f"{output_file}.wav", "wb")
     wf.setnchannels(channels)
@@ -54,11 +54,11 @@ def handle_streaming_response(response, output_file, channels=1, rate=44100):
     try:
         for chunk in response.iter_content(chunk_size=1024):
             if chunk:
-                stream.write(chunk)
+                # stream.write(chunk)
                 wf.writeframesraw(chunk)
     finally:
-        stream.stop_stream()
-        stream.close()
+        # stream.stop_stream()
+        # stream.close()
         p.terminate()
         wf.close()
 
