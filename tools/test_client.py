@@ -9,6 +9,7 @@ from pydub.playback import play
 
 from fish_speech.utils.file import audio_to_bytes, read_ref_text
 from fish_speech.utils.schema import ServeReferenceAudio, ServeTTSRequest
+import time
 
 
 def process_references(reference_id=None, reference_audio=None, reference_text=None):
@@ -107,6 +108,8 @@ def synthesize_speech(
 # Example usage:
 if __name__ == "__main__":
     # Basic usage
+    # Basic usage
+    start_time = time.time()
     synthesize_speech(
         text="Hello, this is a test.",
         normalize=True,
@@ -114,11 +117,14 @@ if __name__ == "__main__":
         max_new_tokens=1024,
         temperature=0.7
     )
+    print(f"Basic synthesis took {time.time() - start_time:.2f} seconds")
 
     # With reference audio
+    start_time = time.time()
     synthesize_speech(
         text="Hello, this is a test with reference.",
         # reference_audio=["path/to/reference.wav"],
         # reference_text=["Reference text"],
         streaming=True
     )
+    print(f"Reference synthesis took {time.time() - start_time:.2f} seconds")
