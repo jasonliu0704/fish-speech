@@ -33,7 +33,7 @@ def generate_test_cases() -> List[Dict[str, Any]]:
     return test_cases
 
 def test_concurrent_synthesis():
-    test_cases = generate_test_cases()[:2]  # Use fewer cases for synthesis test
+    test_cases = generate_test_cases()[:50]  # Use fewer cases for synthesis test
     start_time = time.time()
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
@@ -62,6 +62,8 @@ def test_concurrent_synthesis():
     
     print(f"\nConcurrent Synthesis Results:")
     print(f"Total time: {total_time:.2f} seconds")
+    print(f"Average time per request: {total_time/len(test_cases):.2f} seconds")
+
     print(f"Successful synthesis: {successful_synthesis}/{len(test_cases)}")
     
     assert successful_synthesis == len(test_cases)
