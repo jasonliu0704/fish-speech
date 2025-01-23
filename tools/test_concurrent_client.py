@@ -1,7 +1,7 @@
 import concurrent.futures
 import time
 from typing import List, Dict, Any
-import pytest
+# import pytest
 
 from test_client import create_tts_request, synthesize_speech
 from fish_speech.utils.schema import ServeTTSRequest
@@ -29,12 +29,16 @@ def generate_test_cases() -> List[Dict[str, Any]]:
     ]
 
 def test_create_tts_request():
+    start_time = time.time()
     test_cases = generate_test_cases()
     
     # Test single request creation
     request = create_tts_request(**test_cases[0])
     assert isinstance(request, ServeTTSRequest)
     assert request.text == test_cases[0]["text"]
+    
+    print(f"\nSingle Request Test:")
+    print(f"Total time: {time.time() - start_time:.2f} seconds")
 
 def execute_tts_request(params: Dict[str, Any]) -> tuple[float, bool]:
     start_time = time.time()
@@ -117,6 +121,10 @@ def test_concurrent_synthesis():
 
 if __name__ == "__main__":
     print("Running concurrent TTS request tests...")
+    total_start_time = time.time()
+    
     test_create_tts_request()
     test_concurrent_requests()
     test_concurrent_synthesis()
+    
+    print(f"\nTotal Test Execution Time: {time.time() - total_start_time:.2f} seconds")
